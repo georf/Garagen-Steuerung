@@ -28,13 +28,10 @@ void ShiftOutput::write()
 void ShiftOutput::digitalWrite(uint8_t pin, uint8_t newValue)
 {
     uint8_t row = pin / 8;
-    pin = pin % 8 + 1;
+    pin = pin % 8;
     uint8_t oldValue = bitRead(dataState[row], pin);
     if (oldValue != newValue)
     {
-        Serial.println(row);
-        Serial.println(pin);
-        Serial.println(newValue);
         bitWrite(dataState[row], pin, newValue);
         write();
     }
@@ -43,6 +40,6 @@ void ShiftOutput::digitalWrite(uint8_t pin, uint8_t newValue)
 uint8_t ShiftOutput::digitalRead(uint8_t pin)
 {
     uint8_t row = pin / 8;
-    pin = pin % 8 + 1;
+    pin = pin % 8;
     return bitRead(dataState[row], pin);
 }
