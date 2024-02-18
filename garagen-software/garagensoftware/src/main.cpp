@@ -201,10 +201,16 @@ void switchLightsPushed()
 
 void switchYardGatePushed()
 {
-  client.publish(MQTT_HOFTOR_SWITCH, "1");
-  mqtt_send_status(true);
+  if (yardGateModus == YARD_GATE_CLOSED)
+    client.publish("adebar/carport/gate/set", "OPEN");
+  else if (yardGateModus == YARD_GATE_OPENED)
+    client.publish("adebar/carport/gate/set", "CLOSE");
+  else if (yardGateModus == YARD_GATE_STOPPED)
+    client.publish("adebar/carport/gate/set", "OPEN");
+  else
+    client.publish("adebar/carport/gate/set", "STOP");
+
   yardGateModus = YARD_GATE_RUNNING;
-  handleLights();
 }
 
 void setLightTimeout(uint16_t seconds)
@@ -277,7 +283,9 @@ void handleLights()
     changeRelay(1, LOW);
     changeRelay(2, LOW);
     lightTimeoutSet = false;
-  } else {
+  }
+  else
+  {
     shiftOutput.digitalWrite(OUTPUT_5V_TIMEOUT_LED, LOW);
   }
 
@@ -313,7 +321,8 @@ void mqtt_reconnect()
     else
     {
       client.subscribe("adebar/garage/+/set");
-      client.subscribe(MQTT_HOFTOR_CHANNEL);
+      client.subscribe("adebar/carport/gate/state");
+      client.publish("adebar/garage/system/state", "connected");
       Serial.println("MQTT Connected...");
 
       mqtt_send_status(true);
@@ -325,13 +334,15 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
 {
   char buffer[56];
 
-  if (strcmp(topic, MQTT_HOFTOR_CHANNEL) == 0)
+  if (strcmp(topic, "adebar/carport/gate/state") == 0)
   {
     if (!strncmp((char *)payload, "closed", length) || !strncmp((char *)payload, "unknown", length))
       yardGateModus = YARD_GATE_CLOSED;
-    else if (!strncmp((char *)payload, "opened", length))
+    else if (!strncmp((char *)payload, "open", length))
       yardGateModus = YARD_GATE_OPENED;
-    else if (!strncmp((char *)payload, "opening", length) || !strncmp((char *)payload, "closing", length) || !strncmp((char *)payload, "running", length))
+    else if (!strncmp((char *)payload, "stopped", length))
+      yardGateModus = YARD_GATE_STOPPED;
+    else if (!strncmp((char *)payload, "opening", length) || !strncmp((char *)payload, "closing", length))
       yardGateModus = YARD_GATE_RUNNING;
   }
 

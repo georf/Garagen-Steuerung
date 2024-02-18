@@ -28,6 +28,7 @@ uint8_t const relayBits[] = {
 #define YARD_GATE_CLOSED 0
 #define YARD_GATE_OPENED 1
 #define YARD_GATE_RUNNING 2
+#define YARD_GATE_STOPPED 3
 
 #define COVER_STATE_CLOSED 0
 #define COVER_STATE_OPENED 1
@@ -62,8 +63,6 @@ void pressCoverSwitch();
 #define SWITCH_LIGHTS_PRESSED !switchLights.high()
 #define SWITCH_YARD_GATE_PRESSED !switchYardGate.high()
 
-#define MQTT_HOFTOR_CHANNEL "adebar/smartgate/state"
-#define MQTT_HOFTOR_SWITCH "adebar/smartgate/toggle"
 #define readRelay(relay) !shiftOutput.digitalRead(relayBits[relay])
 
 void mqtt_reconnect();
