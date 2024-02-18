@@ -356,6 +356,15 @@ void mqtt_callback(char *topic, byte *payload, unsigned int length)
       coverDesiredState = COVER_STATE_OPENED;
     return;
   }
+  
+  if (!strcmp(topic, "adebar/garage/system/set"))
+  {
+    if (!strncmp((char *)payload, "RESTART", length))
+    {
+      ESP.restart();
+    }
+    return;
+  }
 
   for (uint8_t relay = 0; relay < 8; relay++)
   {
